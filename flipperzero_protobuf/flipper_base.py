@@ -120,29 +120,18 @@ class FlipperProtoBase:
         serial_dev = dev or self._find_port()
 
         if serial_dev is None:
-            print("can not find Flipper serial dev")
-            sys.exit(0)
+            raise FlipperProtoException("Unable to find Flipper Zero device. Did you plug it in?")
 
         if not os.path.exists(serial_dev):
-            print(f"can not open {serial_dev}")
-            sys.exit(0)
+            raise FlipperProtoException(f"Unable to open '{serial_dev}' serial device. Check permissions.")
 
         if self._debug:
             print(f"Using port {serial_dev}")
 
-        # open serial port
-        # serial.serialutil.SerialException
-        # flipper = serial.Serial(sys.argv[1], timeout=1)
-        flipper = serial.Serial(serial_dev, timeout=1)
-        flipper.baudrate = 230400
+        flipper = serial.Serial(serial_dev, timeout=5.0)
+        flipper.baudrate = 230_400
         flipper.flushOutput()
         flipper.flushInput()
-
-        # disable timeout
-        flipper.timeout = None
-
-        # wait for prompt
-        # flipper.read_until(b'>: ')
 
         return flipper
 
